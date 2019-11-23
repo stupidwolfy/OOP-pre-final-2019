@@ -3,42 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pre2;
+package pre3;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.PopupMenu;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.scene.control.Alert;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 
 /**
  *
  * @author aon_c
  */
-public class pre2 {
+public class pre3 {
 
     private JFrame f1;
     private JPanel superp1, p1, p2, p3;
@@ -49,6 +26,8 @@ public class pre2 {
     private String[] type_item;
     private ArrayList<Book> book_table = new ArrayList<>();
     private int pointer = 0;
+    private ActionListener al;
+    private WindowAdapter wl;
 
     public void init() {
         try {
@@ -64,7 +43,7 @@ public class pre2 {
         p2 = new JPanel(new FlowLayout());
         p3 = new JPanel(new FlowLayout());
 
-        ActionListener al = new ActionListener() {
+        al = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (ae.getSource().equals(prev)) {
@@ -83,6 +62,16 @@ public class pre2 {
                     System.out.println("delete");
                     deletefunc();
                 }
+            }
+        };
+
+        wl = new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+                System.out.println("Saving.....");
+                save();
+                System.out.println("Closing....");
+                we.getWindow().dispose();
             }
         };
 
@@ -107,6 +96,8 @@ public class pre2 {
         add.addActionListener(al);
         update.addActionListener(al);
         delete.addActionListener(al);
+
+        f1.addWindowListener(wl);
 
         p1.add(namel);
         p1.add(name);
@@ -190,24 +181,21 @@ public class pre2 {
     }
 
     public void save() {
-        File f = new File("book.dat");
+        File f = new File("book2.dat");
         try {
             FileOutputStream fout = new FileOutputStream(f);
             ObjectOutputStream Oout = new ObjectOutputStream(fout);
             Oout.writeObject(book_table);
             Oout.close();
             fout.close();
-            System.out.println("Update completed");
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex.toString());
         } catch (IOException ex) {
             System.out.println(ex.toString());
         }
-
+        System.out.println("Update completed");
     }
 
     public void load() {
-        File f = new File("book.dat");
+        File f = new File("book2.dat");
         try {
             FileInputStream fin = new FileInputStream(f);
             ObjectInputStream Oin = new ObjectInputStream(fin);
@@ -215,8 +203,6 @@ public class pre2 {
             book_table = (ArrayList) readed;
             Oin.close();
             fin.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex.toString());
         } catch (IOException | ClassNotFoundException ex) {
             System.out.println(ex.toString());
         }
@@ -230,6 +216,9 @@ public class pre2 {
     }
 
     public void view() {
+        if (pointer > book_table.size()) {
+            pointer = book_table.size();
+        }
         if (book_table.size() > 0) {
             Book std = book_table.get(pointer);
             name.setText(std.getName());
@@ -245,6 +234,6 @@ public class pre2 {
     }
 
     public static void main(String[] args) {
-        new pre2().init();
+        new pre3().init();
     }
 }
